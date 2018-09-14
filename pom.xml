@@ -4,13 +4,18 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.rtempleton</groupId>
 	<artifactId>PhoenixUDFs</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>5.0.0</version>
 	<dependencies>
 		<dependency>
 			<groupId>org.apache.phoenix</groupId>
 			<artifactId>phoenix-core</artifactId>
 			<version>${PhoenixVersion}</version>
 			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>1.6</version>
 		</dependency>
 	</dependencies>
 
@@ -76,7 +81,7 @@
 
 
 	<properties>
-		<PhoenixVersion>4.7.0.2.6.0.12-1</PhoenixVersion>
+		<PhoenixVersion>5.0.0.3.0.0.0-1634</PhoenixVersion>
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 	</properties>

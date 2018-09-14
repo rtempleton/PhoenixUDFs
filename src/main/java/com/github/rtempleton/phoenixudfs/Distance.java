@@ -1,98 +1,97 @@
 package com.github.rtempleton.phoenixudfs;
 
-import java.sql.Timestamp;
 import java.util.List;
 
 import org.apache.hadoop.hbase.io.ImmutableBytesWritable;
 import org.apache.phoenix.compile.KeyPart;
 import org.apache.phoenix.expression.Expression;
-import org.apache.phoenix.expression.function.FunctionExpression.OrderPreserving;
 import org.apache.phoenix.expression.function.ScalarFunction;
 import org.apache.phoenix.parse.FunctionParseNode.Argument;
 import org.apache.phoenix.parse.FunctionParseNode.BuiltInFunction;
 import org.apache.phoenix.schema.tuple.Tuple;
-import org.apache.phoenix.schema.types.PChar;
 import org.apache.phoenix.schema.types.PDataType;
-import org.apache.phoenix.schema.types.PInteger;
+import org.apache.phoenix.schema.types.PDouble;
 import org.apache.phoenix.schema.types.PTimestamp;
-import org.joda.time.DateTime;
 
-@BuiltInFunction(name=AddTime.FUNC_NAME,  args={@Argument(allowedTypes={PTimestamp.class}), @Argument(allowedTypes={PInteger.class}), @Argument(allowedTypes={PChar.class}),} )
-public class AddTime extends ScalarFunction {
-
-	public static final String FUNC_NAME = "AddTime";
+@BuiltInFunction(name=AddTime.FUNC_NAME,  args={@Argument(allowedTypes={PDouble.class}), @Argument(allowedTypes={PDouble.class}), @Argument(allowedTypes={PDouble.class}), @Argument(allowedTypes={PDouble.class})} )
+public class Distance extends ScalarFunction {
 	
-	public AddTime() {
+	public static final String FUNC_NAME = "Distance";
+
+	public Distance() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public AddTime(List<Expression> children) {
+	public Distance(List<Expression> children) {
 		super(children);
 		// TODO Auto-generated constructor stub
 	}
 
+	@Override
 	public boolean evaluate(Tuple tuple, ImmutableBytesWritable ptr) {
 		
-		Timestamp t = null;
-		Integer a = null;
-		String u = null;
+		Double lat1 = null;
+		Double lon1 = null;
+		Double lat2 = null;
+		Double lon2 = null;
 		
-		for (int i=0; i<3; i++) {
+		for (int i=0; i<4; i++) {
 			Expression arg = getChildren().get(i);
 			if(!arg.evaluate(tuple, ptr))
 				return false;
 		
 			switch(i) {
 			case 0:
-				t = (Timestamp) PTimestamp.INSTANCE.toObject(ptr);
+				lat1 = (Double) PDouble.INSTANCE.toObject(ptr);
 				break;
 			case 1:
-				a = (Integer) PInteger.INSTANCE.toObject(ptr);
+				lon1 = (Double) PDouble.INSTANCE.toObject(ptr);
 				break;
 			case 2:
-				u = new String(ptr.copyBytes());
+				lat2 = (Double) PDouble.INSTANCE.toObject(ptr);
+				break;
+			case 3:
+				lon2 = (Double) PDouble.INSTANCE.toObject(ptr);
 				break;
 			default:
 				return true;
 			}
+			
+			
 		}
 		
-		DateTime d = new DateTime(t.getTime());
-		switch(u) {
-		case "y":
-			d = d.plusYears(a);
-			break;
-		case "M":
-			d = d.plusMonths(a);
-			break;
-		case "d":
-			d = d.plusDays(a);
-			break;
-		case "h":
-			d = d.plusHours(a);
-			break;
-		case "m":
-			d = d.plusMinutes(a);
-			break;
-		case "s":
-			d = d.plusSeconds(a);
-			break;
-		default:
-			return true;
-		
-		}
-		
-		Timestamp x = new Timestamp(d.getMillis());
-		ptr.set(PTimestamp.INSTANCE.toBytes(x));
+		double dist = distance(lat1, lon1, lat2, lon2);
+		ptr.set(PDouble.INSTANCE.toBytes(dist));
 		return true;
-		
 	}
+	
+	private static double distance(double lat1, double lon1, double lat2, double lon2) {
+        double theta = lon1 - lon2;
+        double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
+        dist = Math.acos(dist);
+        dist = rad2deg(dist);
+        dist = dist * 60 * 1.1515;
+        return (dist);
+ }
 
+    private static double deg2rad(double deg) {
+           return (deg * Math.PI / 180.0);
+    }
+
+    private static double rad2deg(double rad) {
+           return (rad * 180 / Math.PI);
+    }
+
+
+	@Override
 	public PDataType getDataType() {
-		return PTimestamp.INSTANCE;
+		// TODO Auto-generated method stub
+		return PDouble.INSTANCE;
 	}
 
+	@Override
 	public String getName() {
+		// TODO Auto-generated method stub
 		return FUNC_NAME;
 	}
 	

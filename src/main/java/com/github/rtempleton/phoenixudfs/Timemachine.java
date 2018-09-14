@@ -10,12 +10,11 @@ import org.apache.phoenix.parse.FunctionParseNode.Argument;
 import org.apache.phoenix.parse.FunctionParseNode.BuiltInFunction;
 import org.apache.phoenix.schema.tuple.Tuple;
 import org.apache.phoenix.schema.types.PDataType;
-import org.apache.phoenix.schema.types.PDouble;
 import org.apache.phoenix.schema.types.PInteger;
 import org.apache.phoenix.schema.types.PTimestamp;
 import org.joda.time.DateTime;
 
-@BuiltInFunction(name=AddTime.FUNC_NAME,  args={@Argument(allowedTypes={PTimestamp.class}), @Argument(allowedTypes={PInteger.class}), @Argument(allowedTypes={PInteger.class})} )
+@BuiltInFunction(name=Timemachine.FUNC_NAME,  args={@Argument(allowedTypes={PTimestamp.class}), @Argument(allowedTypes={PInteger.class}), @Argument(allowedTypes={PInteger.class})} )
 public class Timemachine extends ScalarFunction {
 	
 	public static final String FUNC_NAME = "Timemachine";
@@ -27,7 +26,6 @@ public class Timemachine extends ScalarFunction {
 		super(children);
 	}
 
-	@Override
 	public boolean evaluate(Tuple tuple, ImmutableBytesWritable ptr) {
 		
 		Timestamp t = null;
@@ -64,12 +62,10 @@ public class Timemachine extends ScalarFunction {
 		return true;
 	}
 
-	@Override
 	public PDataType getDataType() {
 		return PTimestamp.INSTANCE;
 	}
 
-	@Override
 	public String getName() {
 		return FUNC_NAME;
 	}
